@@ -3,28 +3,23 @@ const inquirer = require('inquirer');
 
 // Import mysql2
 const mysql = require('mysql2');
-const Connection = require('mysql2/typings/mysql/lib/Connection');
+const { showDepartments, showRoles, showEmployees } = require('./db');
+
+const db = require('./db');
 
 
 
+init();
 
-// connect to the database 
-const connection = mysql.createConnection(
-  {
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
-    database: 'employeetracker_db'
-  },
-  // console.log('Connect to the employeetracker_db database')
-);
+function init() {
+  promptUser();
+}
 
 
-
-// inqurier Package
+// inqurier Package =============================
 // setting up the questions 
 
-const promptUser = () => {
+function promptUser() {
 
   inquirer.prompt([
     /* Pass your questions in here */
@@ -49,60 +44,69 @@ const promptUser = () => {
     }
   ])
 
-  // tp print it to the screen we do .then and we can do the call back with the arrow function 
+  // to print it to the screen we do .then and we can do the call back with the arrow function 
   .then((answers) => {
-    const answers = {choices};
+    let choices = answers.choices;
     // console.log("Test");
   
-    if (choices === "view all departments") {
-      viewDepartment();
-    }
-    if (choices === "View all roles") {
-      showRoles();
-    }
-
-    if (choices === "View all employees") {
-      showEmployees();
-    }
-
-    if (choices === "Add a department") {
-      addDepartment();
-    }
-
-    if (choices === "Add a role") {
-      addRole();
-    }
-
-    if (choices === "Add an employee") {
-      addEmployee();
-    }
-
-    if (choices === "Update an employee role") {
-      updateEmployee();
-    }
-
-    if (choices === "Update an employee manager") {
-      updateManager();
-    }
-
-    if (choices === "View employee by department") {
-      employeeDepartment();
-    }
-
-    if (choices === "Delete a role") {
-      deleteRole();
-    }
-
-    if (choices === "Delete an employee") {
-      deleteEmployee();
-    }
-
-    if (choices === "View department budgets") {
-      viewBudget();
+    switch (choices) {
+      case 'View all departments':
+        showDepartments();
+        break;
+    
+      case 'View all roles':
+        showRoles();
+        break;
+      case 'View all employees':
+        showEmployees();
+        break;
+      case 'Add a department':
+        addDeparment();
+        break;
+      case 'Add a role':
+        addRole();
+        break;
+      case 'Add an employee':
+        addEmployee();
+        break;
+      case 'Update an employee role':
+        updateEmployee();
+        break;
+      case 'Update an employee manager':
+        updateManager();
+        break;
+      case 'View employees by department':
+        viewEmployeesByDepartment();
+        break;
+      case 'Delete a department':
+        deleteDepartment();
+        break;
+      case 'Delete a role':
+        deleteRole();
+        break;
+      case 'Delete an employee':
+        deleteEmployee();
+        break;
+      case 'View department budgets':
+        viewBudgets();
+        break;
+      default:
+        quit();
     }
 
-    if (choices === "No Action") {
-      Connection.end()
-    };
   });
 };
+
+
+function viewDepartment () {
+  db.showDepartments()
+  .then(([rows] ) => {
+    let department = rows 
+    console.log(department);
+
+  })
+  .then(() => {
+    promptUser();
+  })
+}
+
