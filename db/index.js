@@ -1,4 +1,4 @@
-const connection = require('./connections');
+const connection = require('./connection');
 
 class DB{
     constructor (connection) {
@@ -18,25 +18,28 @@ class DB{
     console.log('Showing all roles...\n');
     const sql = `SELECT role.id, role.title, department.name as department 
     FROM role
-    INNER JOIN department ON role.department_id = department.id;`;
+    INNER JOIN department ON role.department_id = department.id;`
+    return this.connection.promise().query(sql);
 }
 
 // function to show all employees 
  showEmployees() {
     console.log('Showing all employees ...\n')
-    const sql =  `SELECT employee.id, employee.first_name, employee.last_name, role.title,
-                 department.name as department, role.salary
-                 CONCAT (manager.first_name, " ", manager.last_name) AS manager
-                 FROM employee
-                 LEFT JOIN role ON employee.role_id = role.id
-                 LEFT JOIN department ON role.department_id = department.id
-                 LEFT JOIN employee manager ON employee.manager_id = manager.id;`
+    const sql =  "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id;"
+     return this.connection.promise().query(sql);
 }
 
 // function to add a department 
 
 
 // function to add a role
+
+
+// function to add a new employee 
+ addEmployee (employee) {
+     const sql = "INSERT INTO employee SET ?";
+        return this.connection.promise().query(sql, employee);
+ }
 
 
 

@@ -51,14 +51,14 @@ function promptUser() {
   
     switch (choices) {
       case 'View all departments':
-        showDepartments();
+        viewDepartment();
         break;
     
       case 'View all roles':
-        showRoles();
+        viewRoles();
         break;
       case 'View all employees':
-        showEmployees();
+        viewEmployees();
         break;
       case 'Add a department':
         addDeparment();
@@ -109,4 +109,120 @@ function viewDepartment () {
     promptUser();
   })
 }
+
+function viewRoles () {
+  db.showRoles()
+  .then(([rows]) => {
+    let roles = rows
+    console.log(roles);
+  })
+
+  .then(() => {
+    promptUser();
+  })
+}
+
+
+function viewEmployees () {
+  db.showEmployees()
+  .then(([rows]) => {
+    let employees = rows
+    console.log(employees)
+  })
+
+  .then(() => {
+    promptUser();
+  })
+}
+
+
+// =========now create the 'add' functions ====================
+// add department function
+
+function addDeparment () {
+  inquirer
+    .prompt({
+      type: 'input',
+      name: 'addDepartment',
+      message: 'What is the name of the new department?'
+    })
+    .then((answer) => {
+      // need to finish this 
+    })
+}
+
+// add role
+
+function addRole () {
+  inquirer
+    .prompt([
+      {
+        type: 'input',
+        name: 'addRole',
+        message: 'What is the name if the new role?'
+      },
+      {
+        type: 'input',
+        name: 'newSalary',
+        message: 'What is the salary of the new role?',
+      },
+      {
+        type: "list",
+        name: "whichDepartment",
+        message: "In which department is the new role?",
+        choices: ["Department 1", "Department 2", "Department 3"],
+      },
+    ])
+    .then((answer) => {
+      console.log(answer.addRole);
+      console.log(answer.newSalary);
+      console.log(answer.whichDepartment);
+
+
+      promptUser();
+    });
+};
+
+
+// add an employee
+function addEmployee() {
+  inquirer
+    .prompt([
+      {
+        type: 'input',
+        name: 'employeeFirstName',
+        message: 'What is the first name of the new employee?'
+      },
+      {
+        type: 'input',
+        name: 'employeeLastName',
+        message: 'What is the last name of the new employee?'
+      },
+
+      {
+        type: 'input',
+        name: 'employeeRole',
+        message: 'What is the role of this employee?'
+      },
+
+      {
+        type: 'input',
+        name: 'employeeManager',
+        message: 'who is the manager of the new employee?'
+      },
+    ])
+      .then((newEmployee) => {
+        console.log(answer.employeeFirstName);
+        console.log(answer.employeeLastName);
+        console.log(answer.employeeRole);
+        console.log(answer.employeeManager);
+        db.addEmployee(newEmployee);
+
+        promptUser();
+      });
+};
+
+// ==========Now add the 'update' function =================
+
+
 
