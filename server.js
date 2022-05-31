@@ -34,12 +34,6 @@ function promptUser() {
                 'Add a role', 
                 'Add an employee', 
                 'Update an employee role',
-                'Update an employee manager',
-                'View employees by department',
-                'Delete a department',
-                'Delete a role',
-                'Delete an employee',
-                'View department budgets',
                 'No Action']
     }
   ])
@@ -239,44 +233,142 @@ inquirer
 // add an employee
 function addEmployee() {
   inquirer
-    .prompt([
-      {
-        type: 'input',
-        name: 'employeeFirstName',
-        message: 'What is the first name of the new employee?'
-      },
-      {
-        type: 'input',
-        name: 'employeeLastName',
-        message: 'What is the last name of the new employee?'
-      },
+  .prompt([
+    {
+      type: 'input',
+      name: 'first_name',
+      message: 'What is the first name of the new employee?'
+    },
+    {
+      type: 'input',
+      name: 'last_name',
+      message: 'What is the last name of the new employee?'
+    },
 
-      {
-        type: 'input',
-        name: 'employeeRole',
-        message: 'What is the role of this employee?'
-      },
+    {
+      type: 'input',
+      name: 'roleId',
+      message: 'What is the role of this employee?',
+      // choices: roleChoices
+    },
 
-      {
-        type: 'input',
-        name: 'employeeManager',
-        message: 'who is the manager of the new employee?'
-      },
-    ])
-      .then((newEmployee) => {
-        console.log(answer.employeeFirstName);
-        console.log(answer.employeeLastName);
-        console.log(answer.employeeRole);
-        console.log(answer.employeeManager);
-        db.addEmployee(newEmployee);
+    {
+      type: 'input',
+      name: 'employeeManager',
+      message: 'who is the manager of the new employee?'
+    },
+  ])
+  
+  .then(res => {
+    let firstName = res.first_name;
+    let lastName = res.last_name;
 
-        promptUser();
-      });
+    db.showRoles()
+    .then(([rows]) =>{
+      let roles = rows;
+      const roleChoices = roles.map(({id, title}) =>({
+        name: title,
+        value: id
+      }));
+inquirer
+      .prompt({
+        type: "list",
+        name: "roleId",
+        message: "What's the employee's role?",
+        choices: roleChoices
+    })
+        .then(res => {
+            let roleId = res.roleId;
+
+            db.showEmployees()
+                .then(([rows]) => {
+                    let employees = rows;
+                    const managerChoices = employees.map(({ id, first_name, last_name }) => ({
+                        name: `${first_name} ${last_name}`,
+                        value: id
+                    }));
+
+                    managerChoices.unshift({ name: "None", value: null });
+inquirer
+                    .prompt({
+                        type: "list",
+                        name: "managerId",
+                        message: "Who will be the employee's manager?",
+                        choices: managerChoices
+                    })
+                        .then(res => {
+                            let employee = {
+                                manager_id: res.managerId,
+                                role_id: roleId,
+                                first_name: firstName,
+                                last_name: lastName
+                            }
+
+                            db.addEmployee(employee);
+                        })
+                        .then(() => console.log(
+                            `Added ${firstName} ${lastName} to the database`
+                        ))
+                        .then(() => promptUser())
+                })
+        })
+
+    })
+
+  })
+
+
+
 };
 
-// ==========Now add the 'update' function =================
+// +===========================================================================
 
 
+// Update an employee's role
+function updateEmployeeRole() {
+  db.showEmployees()
+      .then(([rows]) => {
+          let employees = rows;
+          const employeeChoices = employees.map(({ id, first_name, last_name }) => ({
+              name: `${first_name} ${last_name}`,
+              value: id
+          }));
+inquirer
+          .prompt([
+              {
+                  type: "list",
+                  name: "employeeId",
+                  message: "Which employee's role do you want to update?",
+                  choices: employeeChoices
+              }
+          ])
+              .then(res => {
+                  let employeeId = res.employeeId;
+                  db.showRoles()
+                      .then(([rows]) => {
+                          let roles = rows;
+                          const roleChoices = roles.map(({ id, title }) => ({
+                              name: title,
+                              value: id
+                          }));
+inquirer
+                          .prompt([
+                              {
+                                  type: "list",
+                                  name: "roleId",
+                                  message: "What's the new role of this employee?",
+                                  choices: roleChoices
+                              }
+                          ])
+                              .then(res => db.updateEmployeeRole(employeeId, res.roleId))
+                              .then(() => console.log("Employee's role is updated"))
+                              .then(() => promptUser())
+                      });
+              });
+      })
+}
 
-
-
+// Quit the app
+function quit() {
+  process.exit();
+}
