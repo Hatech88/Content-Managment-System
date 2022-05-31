@@ -64,32 +64,32 @@ function promptUser() {
         addDeparment();
         break;
       case 'Add a role':
-        addRole();
+        createRole();
         break;
       case 'Add an employee':
         addEmployee();
         break;
       case 'Update an employee role':
-        updateEmployee();
+        updateEmployeeRole();
         break;
-      case 'Update an employee manager':
-        updateManager();
-        break;
-      case 'View employees by department':
-        viewEmployeesByDepartment();
-        break;
-      case 'Delete a department':
-        deleteDepartment();
-        break;
-      case 'Delete a role':
-        deleteRole();
-        break;
-      case 'Delete an employee':
-        deleteEmployee();
-        break;
-      case 'View department budgets':
-        viewBudgets();
-        break;
+      // case 'Update an employee manager':
+      //   updateManager();
+      //   break;
+      // case 'View employees by department':
+      //   viewEmployeesByDepartment();
+      //   break;
+      // case 'Delete a department':
+      //   deleteDepartment();
+      //   break;
+      // case 'Delete a role':
+      //   deleteRole();
+      //   break;
+      // case 'Delete an employee':
+      //   deleteEmployee();
+      //   break;
+      // case 'View department budgets':
+      //   viewBudgets();
+      //   break;
       default:
         quit();
     }
@@ -143,45 +143,97 @@ function addDeparment () {
   inquirer
     .prompt({
       type: 'input',
-      name: 'addDepartment',
+      name: 'name',
       message: 'What is the name of the new department?'
     })
-    .then((answer) => {
-      // need to finish this 
-    })
+    
+    .then(res => {
+      let name = res;
+      db.addDepartment(name)
+          .then(() => console.log(`Added ${name.name} to the database`))
+          .then(() => promptUser())
+  })
 }
 
 // add role
+// Add a role
+function createRole() {
+  db.showDepartments()
+      .then(([rows]) => {
+          let departments = rows;
+          const departmentChoices = departments.map(({ id, name }) => ({
+              name: name,
+              value: id
+          }));
+inquirer
+          .prompt([
+              {
+                  name: "title",
+                  message: "What is the name of the role?"
+              },
+              {
+                  name: "salary",
+                  message: "What is the salary rate?"
+              },
+              {
+                  type: "list",
+                  name: "department_id",
+                  message: "Which department does the role fall under?",
+                  choices: departmentChoices
+              }
+          ])
+              .then(role => {
+                  db.addRole(role)
+                      .then(() => console.log(`Added ${role.title} to the database`))
+                      .then(() => promptUser())
+              })
+      })
+}
 
-function addRole () {
-  inquirer
-    .prompt([
-      {
-        type: 'input',
-        name: 'addRole',
-        message: 'What is the name if the new role?'
-      },
-      {
-        type: 'input',
-        name: 'newSalary',
-        message: 'What is the salary of the new role?',
-      },
-      {
-        type: "list",
-        name: "whichDepartment",
-        message: "In which department is the new role?",
-        choices: ["Department 1", "Department 2", "Department 3"],
-      },
-    ])
-    .then((answer) => {
-      console.log(answer.addRole);
-      console.log(answer.newSalary);
-      console.log(answer.whichDepartment);
+
+// function addRole () {
+//   db.showDepartments()
+//   .then(([rows]) => {
+//       let departments = rows;
+//       const departmentChoices = departments.map(({ id, name }) => ({
+//           name: name,
+//           value: id
+//       }));
+
+//   // inquirer
+//     .prompt([
+//       {
+//         name: 'title',
+//         message: 'What is the name if the new role?'
+//       },
+//       {
+//         name: 'Salary',
+//         message: 'What is the salary of the new role?',
+//       },
+//       {
+//         type: "list",
+//         name: "department_id",
+//         message: "In which department is the new role?",
+//         choices: ["Department 1", "Department 2", "Department 3"],
+//       },
+//     ])
+
+//     .then(role => {
+//       db.addRole(role)
+//           .then(() => console.log(`Added ${role.title} to the database`))
+//           .then(() => promptUser())
+//   });
 
 
-      promptUser();
-    });
-};
+    // .then((answer) => {
+    //   console.log(answer.addRole);
+    //   console.log(answer.newSalary);
+    //   console.log(answer.whichDepartment);
+
+
+    //   promptUser();
+    // });
+// };
 
 
 // add an employee
@@ -223,6 +275,8 @@ function addEmployee() {
 };
 
 // ==========Now add the 'update' function =================
+
+
 
 
 

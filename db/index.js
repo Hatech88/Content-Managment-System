@@ -29,11 +29,16 @@ class DB{
      return this.connection.promise().query(sql);
 }
 
-// function to add a department 
+    //Create a new role
+    addRole(role) {
+        return this.connection.promise().query("INSERT INTO role SET ?", role);
+    }
 
 
-// function to add a role
-
+    //Add a department
+    addDepartment(department) {
+        return this.connection.promise().query("INSERT INTO department SET ?", department);
+    }
 
 // function to add a new employee 
  addEmployee (employee) {
@@ -41,8 +46,21 @@ class DB{
         return this.connection.promise().query(sql, employee);
  }
 
+    //Update the employee's role
+    updateEmployeeRole(employeeId, roleId) {
+        return this.connection.promise().query(
+            "UPDATE employee SET role_id = ? WHERE id = ?",
+            [roleId, employeeId]
+        );
+    }
 
-
+    //Show all managers
+    allManagers(employeeId) {
+        return this.connection.promise().query(
+            "SELECT id, first_name, last_name FROM employee WHERE id != ?",
+            employeeId
+        );
+    }
 
 };
 
